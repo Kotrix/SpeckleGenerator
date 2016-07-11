@@ -37,7 +37,7 @@ String getName(int number)
 
 int main()
 {
-	cout << "Speckle generator\n";
+	cout << "Speckle movement generator\n";
 
 	//base image for generator
 	Mat image = imread("C:\\Users\\Krzysztof\\Pictures\\data\\img01.png", IMREAD_GRAYSCALE);
@@ -80,8 +80,8 @@ int main()
 	RNG rng(0xFFFFFF);
 	Point position = Point(0, 0);
 
-	Mat dst; //matrix for generated image
-	//first image generate
+	Mat dst;
+	//first image generation
 	resize(bigger(mBiggerROI), dst, dstSize, 0, 0, INTER_AREA);
 	imwrite(getName(0), dst);
 
@@ -121,8 +121,8 @@ int main()
 			waitKey(1);
 		}
 
-		movesFile << position.x / (double)scale << "," << position.y / (double)scale << endl;
-		cout << i << ". " << position.x / (double)scale << "," << position.y / (double)scale << endl;
+		movesFile << position.x * precision << "," << position.y * precision << endl;
+		cout << i << ". " << position.x * precision << "," << position.y * precision << endl;
 
 		resize(bigger(mBiggerROI), dst, dstSize, 0, 0, INTER_AREA);
 		imwrite(getName(i), dst);
