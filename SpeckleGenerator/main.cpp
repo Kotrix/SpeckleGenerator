@@ -44,10 +44,10 @@ int main()
 	//output for ground truth file
 	ofstream movesFile("images\\moves.txt");
 
-	Size dstSize = Size(640, 640); //size of images to generate
+	Size dstSize = Size(512, 512); //size of images to generate
 	int moves = 100; //number of images (moves) to generate
-	Point2f direction = Point2f(5.0, -5.0); //starting direction
-	Point2f maxDev = Point2f(1.0, 1.0); //maximum deviation from direction
+	Point2f direction = Point2f(0, -13); //starting direction
+	Point2f maxDev = Point2f(0,0); //maximum deviation from direction
 	double precision = 0.1;
 	bool drawPath = false;
 
@@ -81,48 +81,47 @@ int main()
 	Point position = Point(0, 0);
 
 	Mat dst;
-	//first image generation
-	resize(bigger(mBiggerROI), dst, dstSize, 0, 0, INTER_AREA);
-	imwrite(getName(0), dst);
-
 	if(drawPath) namedWindow("path", WINDOW_NORMAL);
 
-	for (int i = 1; i <= moves; i++)
+	for (int i = 0; i <= moves; i++)
 	{
-		//get next translation vector
-		Point move(intDirection.x + rng.uniform(-intMaxDev.x, intMaxDev.x), intDirection.y + rng.uniform(-intMaxDev.y, intMaxDev.y));
-		move.y = -move.y; //invert Y axis for Euclidean move
-		Point nextROIpoint = mBiggerROI.tl() + move;
-		
-		//change direction if boundary approached
-		if (nextROIpoint.x < 0 || nextROIpoint.x > bigger.cols - mBiggerROI.width)
+		if (i != 0)
 		{
-			intDirection.x = -intDirection.x;
-			move.x = -move.x;
-		}
-		if (nextROIpoint.y < 0 || nextROIpoint.y > bigger.rows - mBiggerROI.height)
-		{
-			intDirection.y = -intDirection.y;
-			move.y = -move.y;
-		}
-		
-		mBiggerROI += move;
-		move.y = -move.y; //re-invert Y axis for Euclidean move
-		position += move;
+			//get next translation vector
+			Point move(intDirection.x + rng.uniform(-intMaxDev.x, intMaxDev.x), intDirection.y + rng.uniform(-intMaxDev.y, intMaxDev.y));
+			move.y = -move.y; //invert Y axis for Euclidean move
+			Point nextROIpoint = mBiggerROI.tl() + move;
 
-		if (drawPath)
-		{
-			//draw and show path
-			Mat pathImg;
-			cvtColor(bigger, pathImg, CV_GRAY2BGR);
-			//line(pathImg, mBiggerROI.tl() - move, mBiggerROI.tl(), Scalar(0, 255, 0), 2 * scale);
-			rectangle(pathImg, mBiggerROI, Scalar(0, 0, 255), 2 * scale);
-			imshow("path", pathImg);
-			waitKey(1);
-		}
+			//change direction if boundary approached
+			if (nextROIpoint.x < 0 || nextROIpoint.x > bigger.cols - mBiggerROI.width)
+			{
+				intDirection.x = -intDirection.x;
+				move.x = -move.x;
+			}
+			if (nextROIpoint.y < 0 || nextROIpoint.y > bigger.rows - mBiggerROI.height)
+			{
+				intDirection.y = -intDirection.y;
+				move.y = -move.y;
+			}
 
-		movesFile << position.x * precision << "," << position.y * precision << endl;
-		cout << i << ". " << position.x * precision << "," << position.y * precision << endl;
+			mBiggerROI += move;
+			move.y = -move.y; //re-invert Y axis for Euclidean move
+			position += move;
+
+			if (drawPath)
+			{
+				//draw and show path
+				Mat pathImg;
+				cvtColor(bigger, pathImg, CV_GRAY2BGR);
+				//line(pathImg, mBiggerROI.tl() - move, mBiggerROI.tl(), Scalar(0, 255, 0), 2 * scale);
+				rectangle(pathImg, mBiggerROI, Scalar(0, 0, 255), 2 * scale);
+				imshow("path", pathImg);
+				waitKey(1);
+			}
+
+			movesFile << position.x * precision << "," << position.y * precision << endl;
+			cout << i << ". " << position.x * precision << "," << position.y * precision << endl;
+		}
 
 		resize(bigger(mBiggerROI), dst, dstSize, 0, 0, INTER_AREA);
 		imwrite(getName(i), dst);
